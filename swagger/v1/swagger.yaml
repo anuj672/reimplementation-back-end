@@ -244,4 +244,5 @@ servers:
 - url: http://{defaultHost}
   variables:
     defaultHost:
-      default: 127.0.0.1:3000
+      #default: 127.0.0.1:3000
+      default: 152.7.179.176:8080
