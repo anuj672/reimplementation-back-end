@@ -47,13 +47,7 @@ class Api::V1::SignUpTopicsController < ApplicationController
   # filters topics based on assignment id (required) and topic identifiers (optional)
   # follows a restful API and is called on the GET call.
   def filter
-    if params[:assignment_id].nil?
-      render json: {message: 'Assignment ID is required!' }, status: :unprocessable_entity
-    elsif params[:topic_ids].nil?
-      @stopics = SignUpTopic.where(assignment_id: params[:assignment_id])
-    else
-      @stopics = SignUpTopic.where(assignment_id: params[:assignment_id], topic_identifier: params[:topic_ids])
-    end
+    get_selected_topics
     render json: {message: 'All selected topics have been loaded successfully.', sign_up_topics: @stopics}, status: 200
   end
 
@@ -62,13 +56,7 @@ class Api::V1::SignUpTopicsController < ApplicationController
   # assignment id IN COMBINATION with the topic id DELETES the topics
   def delete_filter
     #filters topics based on assignment id (required) and topic identifiers (optional)
-    if params[:assignment_id].nil?
-      render json: {message: 'Assignment ID is required!' }, status: :unprocessable_entity
-    elsif params[:topic_ids].empty?
-      @stopics = SignUpTopic.where(assignment_id: params[:assignment_id])
-    else
-      @stopics = SignUpTopic.where(assignment_id: params[:assignment_id], topic_identifier: params[:topic_ids])
-    end
+    get_selected_topics
     @stopics.each(&:delete)
     render json: {message: 'All selected topics have been deleted successfully.', sign_up_topics: @stopics }, status: 200
   end
@@ -82,5 +70,15 @@ class Api::V1::SignUpTopicsController < ApplicationController
     # Only allow a list of trusted parameters through.
     def sign_up_topic_params
       params.require(:sign_up_topic).permit(:topic_identifier, :category, :topic_name, :max_choosers, :assignment_id)
+    end
+
+    def get_selected_topics
+      if params[:assignment_id].nil?
+        render json: {message: 'Assignment ID is required!' }, status: :unprocessable_entity
+      elsif params[:topic_ids].nil?
+        @stopics = SignUpTopic.where(assignment_id: params[:assignment_id])
+      else
+        @stopics = SignUpTopic.where(assignment_id: params[:assignment_id], topic_identifier: params[:topic_ids])
+      end
     end
 end
